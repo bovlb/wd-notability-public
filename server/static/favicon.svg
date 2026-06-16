@@ -1,0 +1,11 @@
+<svg baseProfile="full" height="18px" version="1.1" viewBox="0 0 36 36" width="18px"
+     xmlns="http://www.w3.org/2000/svg">
+  <circle cx="18.0" cy="18.0" r="14.66" fill="none" stroke-width="3.8"
+         data-field="n" stroke="green"/>
+  <path data-field="n1" d="M12.78,28.04 A11.32,11.32 0 0,1 12.78,7.96 Z" fill="green" />
+  <path data-field="n3" d="M23.22,28.04 A11.32,11.32 0 0,0 23.22,7.96 Z" fill="grey" />
+  <path data-field="n2a" d="M14.1,7.38 A11.32,11.32 0 0,1 21.9,7.38 L21.9,17.28 L14.1,17.28 Z"
+         fill="orange" />
+  <path data-field="n2b" d="M14.1,28.62 A11.32,11.32 0 0,0 21.9,28.62 L21.9,18.72 L14.1,18.72 Z"
+        fill="red" />
+</svg>
