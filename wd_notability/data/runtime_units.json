@@ -1,0 +1,113 @@
+{
+  "version": 1,
+  "defaults": {
+    "env": {
+      "PYTHONUNBUFFERED": "1",
+      "WD_NOTABILITY_ENTITYDATA_WORKERS": "1",
+      "WD_NOTABILITY_ENTITYDATA_POLL_SECONDS": "5.0",
+      "WD_NOTABILITY_INLINKS_BATCH_SIZE": "100",
+      "WD_NOTABILITY_INLINKS_RUN_INTERVAL_SECONDS": "5",
+      "WD_NOTABILITY_RECENT_CHANGES_POLL_SECONDS": "60",
+      "WD_NOTABILITY_RECENT_CHANGES_REWIND_SECONDS": "300",
+      "WD_NOTABILITY_ENTITYDATA_DELETION_POLL_SECONDS": "60",
+      "WD_NOTABILITY_ENTITYDATA_DELETION_BATCH_SIZE": "200",
+      "WD_NOTABILITY_CACHE_SYNC_BATCH_SIZE": "100",
+      "WD_NOTABILITY_CACHE_SYNC_RUN_INTERVAL_SECONDS": "60",
+      "WD_NOTABILITY_CACHE_OBSERVABILITY_RUN_INTERVAL_SECONDS": "60",
+      "WD_NOTABILITY_WIKISUB_BLOCK_SIZE": "100000",
+      "WD_NOTABILITY_WIKISUB_SLEEP_SECONDS": "1.0",
+      "WD_NOTABILITY_WIKISUB_POLL_SECONDS": "60"
+    }
+  },
+  "units": [
+    {
+      "name": "webserver",
+      "groups": ["dev", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "serve"]
+    },
+    {
+      "name": "content",
+      "groups": ["dev", "continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "worker", "--allow-entitydata-without-interest", "--workers", "5"]
+    },
+    {
+      "name": "inlinks",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "inlinks-worker"]
+    },
+    {
+      "name": "recent-changes",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "recent-changes-worker"]
+    },
+    {
+      "name": "content-deletion",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "entitydata-deletion-worker"]
+    },
+    {
+      "name": "external-usage",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "cache-sync-worker"]
+    },
+    {
+      "name": "cache-observability",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "cache-observability-worker"]
+    },
+    {
+      "name": "wikisub-worker",
+      "groups": ["continuous", "toolforge"],
+      "mode": "continuous",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "wikisub-worker"]
+    },
+    {
+      "name": "build-namespace-cache",
+      "groups": ["bootstrap", "scheduled", "toolforge"],
+      "mode": "scheduled",
+      "schedule": "@weekly",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "build-namespace-cache"]
+    },
+    {
+      "name": "build-property-cache",
+      "groups": ["bootstrap", "scheduled", "toolforge"],
+      "mode": "scheduled",
+      "schedule": "@weekly",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "build-property-cache"]
+    },
+    {
+      "name": "build-osm-cache",
+      "groups": ["bootstrap", "scheduled", "toolforge"],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "build-osm-cache"]
+    },
+    {
+      "name": "build-sdc-cache",
+      "groups": ["bootstrap", "scheduled", "toolforge"],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "build-sdc-cache"]
+    },
+    {
+      "name": "build-wikisub-cache",
+      "groups": ["bootstrap", "scheduled", "toolforge"],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "build-wikisub-cache"]
+    },
+    {
+      "name": "reset-main-cache",
+      "groups": [],
+      "mode": "oneshot",
+      "command": ["/bin/sh", "/workspace/scripts/toolforge-entrypoint.sh", "main.py", "reset-main-cache"]
+    }
+  ]
+}

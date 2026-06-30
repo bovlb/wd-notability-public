@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8"?><sqlb_project><db path="evaluation_cache.sqlite3" readonly="0" foreign_keys="1" case_sensitive_like="0" temp_store="0" wal_autocheckpoint="1000" synchronous="2"/><attached/><window><main_tabs open="structure browser pragmas query" current="3"/></window><tab_structure><column_width id="0" width="300"/><column_width id="1" width="0"/><column_width id="2" width="100"/><column_width id="3" width="5074"/><column_width id="4" width="0"/><expanded_item id="0" parent="1"/><expanded_item id="2" parent="0"/><expanded_item id="1" parent="1"/><expanded_item id="2" parent="1"/><expanded_item id="3" parent="1"/></tab_structure><tab_browse><table title="evaluation_cache" custom_title="0" dock_id="1" table="4,16:mainevaluation_cache"/><table title="evaluation_cache" custom_title="0" dock_id="2" table="4,16:mainevaluation_cache"/><dock_state state="000000ff00000000fd00000001000000020000063a00000490fc0100000001fc000000000000063a0000012600fffffffa000000010100000002fb000000160064006f0063006b00420072006f00770073006500310100000000ffffffff0000011a00fffffffb000000160064006f0063006b00420072006f00770073006500320100000000ffffffff0000012600ffffff000003300000000000000004000000040000000800000008fc00000000"/><default_encoding codec=""/><browse_table_settings><table schema="main" name="evaluation_cache" show_row_id="0" encoding="" plot_x_axis="" unlock_view_pk="_rowid_" freeze_columns="0"><sort/><column_widths><column index="1" value="68"/><column index="2" value="75"/><column index="3" value="147"/><column index="4" value="185"/></column_widths><filter_values/><conditional_formats/><row_id_formats/><display_formats><column index="2" value="printf('0x%x', &quot;summary&quot;)"/></display_formats><hidden_columns/><plot_y_axes/><global_filter/></table></browse_table_settings></tab_browse><tab_sql><sql name="SQL 1*">SELECT
+  qid,
+  summary,
+entitydata_last_revid,
+recent_changes_last_revid,
+creation_time,
+creator_actor_id,
+last_updated,
+ entitydata_last_revid &lt; recent_changes_last_revid  OR recent_changes_last_revid is NULL or entitydata_last_revid IS NULL AS stale,
+  CASE (summary &amp; 1)
+    WHEN 1 THEN 'true' ELSE 'false'
+  END AS redirect,
+  CASE (summary &amp; 2)
+    WHEN 2 THEN 'true' ELSE 'false'
+  END AS has_sitelinks,
+  CASE (summary &amp; 4)
+    WHEN 4 THEN 'true' ELSE 'false'
+  END AS has_claims,
+  CASE (summary &amp; 8)
+    WHEN 8 THEN 'true' ELSE 'false'
+  END AS deleted,
+
+  CASE ((summary &gt;&gt; 29) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n1,
+
+  CASE ((summary &gt;&gt; 26) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n2a,
+
+  CASE ((summary &gt;&gt; 23) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n2b,
+
+  CASE ((summary &gt;&gt; 20) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n3_inlinks,
+
+  CASE ((summary &gt;&gt; 17) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n3_osm,
+
+  CASE ((summary &gt;&gt; 14) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n3_wikisub,
+
+  CASE ((summary &gt;&gt; 11) &amp; 7)
+    WHEN 0 THEN 'unknown'
+    WHEN 1 THEN 'none'
+    WHEN 2 THEN 'weak'
+    WHEN 4 THEN 'strong'
+    ELSE 'invalid'
+  END AS n3_sdc
+
+FROM evaluation_cache
+--WHERE qid IN (140256205)
+WHERE qid IN (SELECT DISTINCT qid FROM pubsub_sessions)
+ORDER BY qid;</sql><sql name="SQL 2*">SELECT qid, COUNT(*), MAX(wants_entitydata), MAX(wants_inlinks), MAX(wants_sync), SUM(priority) AS priority, datetime(MAX(expires_at), 'unixepoch')
+FROM pubsub_sessions
+WHERE qid &lt;&gt; 0
+-- WHERE qid in (138317192)
+GROUP BY qid
+ORDER BY priority DESC
+</sql><sql name="SQL 5*">SELECT COUNT(*), wants_entitydata, wants_inlinks, wants_sync  
+FROM pubsub_sessions
+GROUP BY wants_entitydata, wants_inlinks, wants_sync
+ORDER BY wants_entitydata, wants_inlinks, wants_sync</sql><sql name="SQL 6*">SELECT COUNT(*), recent_changes_last_revid IS NULL as rc_done FROM evaluation_cache GROUP BY rc_done</sql><sql name="SQL 7*"> SELECT qid, creator_actor_id, creation_time
+            FROM evaluation_cache
+--             WHERE creation_time IS NOT NULL 
+-- 			AND creator_actor_id IS NOT NULL 
+-- 			AND creation_time &gt;= '2026-06-18T15:24:22Z' 
+-- 			AND creation_time &lt; '2026-06-18T18:24:22Z'
+            ORDER BY qid DESC
+			LIMIT 5000</sql><sql name="SQL 8*">SELECT COUNT(*) FROM (SELECT qid FROM pubsub_sessions GROUP by qid);
+</sql><current_tab id="5"/></tab_sql></sqlb_project>
