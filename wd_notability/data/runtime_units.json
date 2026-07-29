@@ -1,0 +1,294 @@
+{
+  "version": 1,
+  "defaults": {
+    "env": {
+      // Keep Python output unbuffered so worker logs appear promptly.
+      "PYTHONUNBUFFERED": "1",
+      // ToolForge-specific behavior is enabled by default in production.
+      "WD_NOTABILITY_TOOLFORGE": "1",
+      // // Run a single content worker by default in the shared runtime.
+      // "WD_NOTABILITY_CONTENT_WORKERS": "1",
+      // // Poll content work queues every 5 seconds when idle.
+      // "WD_NOTABILITY_CONTENT_POLL_SECONDS": "5.0",
+      // // Process inlinks in batches of 100 candidate QIDs.
+      // "WD_NOTABILITY_INLINKS_BATCH_SIZE": "100",
+      // // Space out inlinks runs by 5 seconds between batches.
+      // "WD_NOTABILITY_INLINKS_RUN_INTERVAL_SECONDS": "5",
+      // // Poll recent changes every minute.
+      // "WD_NOTABILITY_RECENT_CHANGES_POLL_SECONDS": "60",
+      // // Rewind recent changes by 5 minutes to avoid missing edits.
+      // "WD_NOTABILITY_RECENT_CHANGES_REWIND_SECONDS": "300",
+      // // Check deletion events every minute.
+      // "WD_NOTABILITY_CONTENT_DELETION_POLL_SECONDS": "60",
+      // // Scan deletion batches in chunks of 200 rows.
+      // "WD_NOTABILITY_CONTENT_DELETION_BATCH_SIZE": "200",
+      // // Re-run cache observability work at most once a minute.
+      // "WD_NOTABILITY_CACHE_OBSERVABILITY_RUN_INTERVAL_SECONDS": "60",
+      // // Scan wiki-subscriber changes in blocks of 100000 rows.
+      // "WD_NOTABILITY_WIKISUB_BLOCK_SIZE": "100000",
+      // // Pause briefly between wiki-subscriber scan blocks.
+      // "WD_NOTABILITY_WIKISUB_SLEEP_SECONDS": "1.0",
+      // // Poll for new wiki-subscriber changes once a minute.
+      // "WD_NOTABILITY_WIKISUB_POLL_SECONDS": "60"
+    }
+  },
+  "units": [
+    {
+      "name": "webserver",
+      "groups": [
+        "dev",
+        "toolforge"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "serve",
+        "--host",
+        "0.0.0.0",
+        "--log-level",
+        "debug"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "serve"
+      ]
+    },
+    {
+      "name": "content",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "worker",
+        "--workers",
+        "10"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "worker",
+        "--workers",
+        "10"
+      ]
+    },
+    {
+      "name": "inlinks",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "inlinks-worker"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "inlinks-worker"
+      ]
+    },
+    {
+      "name": "recent-changes",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "recent-changes-worker"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "recent-changes-worker"
+      ]
+    },
+    {
+      "name": "content-deletion",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "content-deletion-worker"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "content-deletion-worker"
+      ]
+    },
+    {
+      "name": "cache-observability",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "cache-observability-worker"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "cache-observability-worker"
+      ]
+    },
+    {
+      "name": "wikisub-worker",
+      "groups": [
+        "dev",
+        "toolforge",
+        "continuous"
+      ],
+      "mode": "continuous",
+      "dev-command": [
+        "main.py",
+        "wikisub-worker"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "wikisub-worker"
+      ]
+    },
+    {
+      "name": "build-namespace-cache",
+      "groups": [
+        "toolforge",
+        "bootstrap",
+        "scheduled"
+      ],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "dev-command": [
+        "main.py",
+        "build-namespace-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "build-namespace-cache"
+      ]
+    },
+    {
+      "name": "build-property-cache",
+      "groups": [
+        "toolforge",
+        "bootstrap",
+        "scheduled"
+      ],
+      "mode": "scheduled",
+      "schedule": "@hourly",
+      "dev-command": [
+        "main.py",
+        "build-property-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "build-property-cache"
+      ]
+    },
+    {
+      "name": "build-osm-cache",
+      "groups": [
+        "toolforge",
+        "bootstrap",
+        "scheduled"
+      ],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "dev-command": [
+        "main.py",
+        "build-osm-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "build-osm-cache"
+      ]
+    },
+    {
+      "name": "build-sdc-cache",
+      "groups": [
+        "toolforge",
+        "bootstrap",
+        "scheduled"
+      ],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "dev-command": [
+        "main.py",
+        "build-sdc-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "build-sdc-cache"
+      ]
+    },
+    {
+      "name": "build-wikisub-cache",
+      "groups": [
+        "toolforge",
+        "bootstrap",
+        "scheduled"
+      ],
+      "mode": "scheduled",
+      "schedule": "@daily",
+      "dev-command": [
+        "main.py",
+        "build-wikisub-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "build-wikisub-cache"
+      ]
+    },
+    {
+      "name": "reset-main-cache",
+      "groups": [
+        "maintenance"
+      ],
+      "mode": "oneshot",
+      "dev-command": [
+        "main.py",
+        "reset-main-cache"
+      ],
+      "prod-command": [
+        "/bin/sh",
+        "/workspace/scripts/toolforge-entrypoint.sh",
+        "main.py",
+        "reset-main-cache"
+      ]
+    }
+  ]
+}
